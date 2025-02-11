@@ -28,7 +28,7 @@ class Play extends Phaser.Scene {
             this.physics.world.debugGraphic.clear()
         }, this)
 
-        document.getElementById('info').innerHTML = '"UP": jump | "DOWN": Slide | "D": debug (toggle)'
+        document.getElementById('info').innerHTML = '"UP": jump | "DOWN": slide | "D": debug (toggle)'
 
         this.faded = this.add.rectangle(0, 0, game.config.width, game.config.height, 0xa0b0d7).setOrigin(0, 0)
         this.faded.alpha = 0

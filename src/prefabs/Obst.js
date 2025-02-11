@@ -15,9 +15,17 @@ class Obst extends Phaser.GameObjects.Sprite {
         }
         this.body.setCollideWorldBounds(true)
         this.moveSpeed = speed
+        this.texture = texture
     }
 
     update() {
+        if (this.texture == 'blackhawk') {
+            let sine = Math.sin(this.x / 100)
+            this.y += sine / 3
+        } else if (this.texture == 'jeep') {
+            let sine = Math.sin(this.x / 50)
+            this.y += sine / 5
+        }
         this.x -= this.moveSpeed
 
         if(this.x <= 0 - this.width) {
