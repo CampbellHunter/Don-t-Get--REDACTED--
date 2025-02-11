@@ -15,10 +15,10 @@ let config = {
           debug: true
       }
   },
-  scene: [ Menu, Play ]
+  scene: [ Menu, Play, Credits]
   }
 
 let game = new Phaser.Game(config)
-let keyFIRE, keyRESET, keyLEFT, keyRIGHT
+let keyCREDITS, keyRESET, keyMENU
 let borderUISize = game.config.height / 15
 let borderPadding = borderUISize / 3

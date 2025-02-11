@@ -4,17 +4,61 @@ class Play extends Phaser.Scene {
     }
     
     create() {
+        this.music = this.sound.add('music')
+        this.music.setLoop(true)
+        this.music.setVolume(.25)
+        this.music.play()
+        //this.sound.play('music')
         this.sky = this.add.tileSprite(0, 0, 768, 512, 'sky').setOrigin(0, 0).setScale(2)
         this.background = this.add.tileSprite(0, 0, 768, 512, 'background').setOrigin(0, 0).setScale(2)
         this.foreground = this.add.tileSprite(0, 0, 768, 512, 'foreground').setOrigin(0, 0).setScale(2)
 
-        this.alien = new Alien(this, 150, 400, 'alien', 0)
+        this.physics.world.setBounds(-600, 0, 1668, 450)
+        //const entities = this.physics.add.group()
+        //const meanies = this.physics.add.staticGroup()
+        //this.physics.add.collider(entities, meanies)
+
+        this.alien = new Alien(this, 120, 420, 'alien', 0)
+        this.alien.depth = 1
+        //entities.add(this.alien)
         this.keys = this.input.keyboard.createCursorKeys()
+
+        this.groundBoy = new Obst(this, -400, 0, 'tvman', 0, 4).setOrigin(0, 0).setScale(.85)
+        //meanies.add(this.groundBoy)
+        this.airBoy = new Obst(this, -400, 0, 'roadsign', 0, 4).setOrigin(0, 0).setScale(.85)
+        //meanies.add(this.airBoy)
+        this.airBoy2 = new Obst(this, -400, 0, 'roadsignpole', 0, 4).setOrigin(0, 0).setScale(.85)
+        
+
+        //this.physics.world.addCollider(this.alien, this.airBoy2)
+        //this.physics.world.addCollider(this.entities, this.meanies)
+
+        this.faded = this.add.rectangle(0, 0, game.config.width, game.config.height, 0xa0b0d7).setOrigin(0, 0)
+        this.faded.alpha = 0
+
+        let scoreConfig = {
+            fontFamily: 'Stencil',
+            fontSize: '60px',
+            color: '#FFFFFF',
+            align: 'right',
+            padding: {
+                top: 5,
+                bottom: 5,
+            },
+            fixedWidth: 175
+        }
+        this.timeOff = this.time.now
+        this.timeChecked = false
+        this.timeRunning = this.add.text(570, 10, '00000', scoreConfig)
+        this.doSpawn = true;
+        this.timeScale = 1
+        this.backer = 1
+
         //this.p1Rocket = new Rocket(this, game.config.width/2, game.config.height - borderUISize - borderPadding, 'rocket').setOrigin(0.5, 0)
 
         //keyFIRE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F)
-        //keyRESET = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R)
-        //keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT)
+        keyRESET = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE)
+        keyMENU = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
         //keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT)
 
         //this.ship01 = new Spaceship(this, game.config.width + borderUISize*6, borderUISize*4, 'spaceship', 0, 30).setOrigin(0, 0)
@@ -37,9 +81,9 @@ class Play extends Phaser.Scene {
             fixedWidth: 100
         }
         this.scoreLeft = this.add.text(borderUISize + borderPadding, borderUISize + borderPadding*2, this.p1Score, scoreConfig)
-
+        */
         this.gameOver = false
-
+        /*
         scoreConfig.fixedWidth = 0
         this.clock = this.time.delayedCall(game.settings.gameTimer, () => {
             this.add.text(game.config.width/2, game.config.height/2, 'GAME OVER', scoreConfig).setOrigin(0.5)
@@ -50,71 +94,178 @@ class Play extends Phaser.Scene {
     }
 
     update() {
-        /*
+        
         if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyRESET)) {
             this.scene.restart()
         }
 
-        if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyLEFT)) {
+        if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyMENU)) {
             this.scene.start("menuScene")
          }
-        */
-        this.alienFSM.step()
-        this.foreground.tilePositionX += 2
-        this.background.tilePositionX += 1
-        /*
-        if(!this.gameOver) {               
-            this.p1Rocket.update()
-            this.ship01.update()
-            this.ship02.update()
-            this.ship03.update()
-        } 
 
-        if(this.checkCollision(this.p1Rocket, this.ship03)) {
-            this.p1Rocket.reset()
-            this.shipExplode(this.ship03) 
+        if(!this.gameOver) {
+            if (!this.timeChecked) {
+                this.timeOff = this.time.now
+                this.timeChecked = true
+            }
+
+            
+            let timetext = ("00000" + (Math.floor((this.time.now - this.timeOff)/ 10))).slice(-5)
+            this.timeRunning.text = timetext
+            //console.log(game.settings.speed)
+
+            this.timeScale = 1 + (this.time.now - this.timeOff)/ 100000
+            game.settings.speed = this.timeScale
+            this.music.setRate(1 + ((this.timeScale - 1) / 10))
+
+            this.physics.add.collider(this.alien, this.groundBoy, () => this.hitMe(this.alien, this.groundBoy), null, this)
+            this.physics.add.collider(this.alien, this.airBoy, () => this.hitMe(this.alien, this.airBoy), null, this)
+            //this.physics.world.collide(this.alien, this.airBoy2)
+
+            this.alienFSM.step()
+            this.foreground.tilePositionX += (1.5 * this.timeScale)
+            this.background.tilePositionX += (0.25 * this.timeScale)
+            
+            if (this.doSpawn) {
+                //console.log('Gonna spawn!')
+                this.doSpawn = false;
+                this.spawnBoy()
+            }
+
+            
+            
+                this.groundBoy.update()
+                this.airBoy.update()
+                this.airBoy2.update()
+                //this.physics.world.addCollider(this.entities, this.meanies)
+        } else {
+            if (this.faded.alpha < 1) {
+                this.faded.alpha += 0.001
+            }
+            if (this.timeScale > -10) {
+                if (this.backer > 0) {
+                    this.backer -= 0.001
+                    this.foreground.tilePositionX += (1.5 * (this.backer))
+                    this.background.tilePositionX += (0.25 * (this.backer))
+                }
+                this.timeScale -= 0.01
+                this.music.setRate(1 + ((this.timeScale - 1) / 10))
+            } else {
+                this.music.pause()
+            }
         }
-        if (this.checkCollision(this.p1Rocket, this.ship02)) {
-            this.p1Rocket.reset()
-            this.shipExplode(this.ship02) 
+        
+        /*
+        if(this.checkCollision(this.alien, this.groundBoy)) {
+            //this.p1Rocket.reset()
+            //this.shipExplode(this.ship03) 
+            console.log('DED!')
         }
-        if (this.checkCollision(this.p1Rocket, this.ship01)) {
-            this.p1Rocket.reset()
-            this.shipExplode(this.ship01) 
+        if (this.checkCollision(this.alien, this.airBoy)) {
+            //this.p1Rocket.reset()
+            //this.shipExplode(this.ship02) 
+            console.log('DED!')
+        }
+        if (this.checkCollision(this.alien, this.airBoy2)) {
+            //this.p1Rocket.reset()
+            //this.shipExplode(this.ship01) 
+            console.log('DED!')
         }
         */
     }
-
-    checkCollision(rocket, ship) {
-        /*
-        if (rocket.x < ship.x + ship.width && 
-            rocket.x + rocket.width > ship.x && 
-            rocket.y < ship.y + ship.height &&
-            rocket.height + rocket.y > ship. y) {
+    /*
+    checkCollision(obst, alien) {
+        
+        if (alien.x < obst.x + (obst.width * 0.75) && 
+            alien.x + alien.width > obst.x && 
+            alien.y < obst.y + (obst.height * 0.75) &&
+            alien.height + alien.y > obst. y) {
             return true
         } else {
             return false
         }
-        */
+    }
+    */
+    spawnBoy() {
+        let spawner = Math.floor(Math.random() * 5000 + 5000) / this.timeScale
+        this.clock = this.time.delayedCall(spawner, () => {
+            let local = Math.floor(Math.random() * 3)
+            if (this.gameOver == false) {
+                if (local == 2) {
+                    //console.log('air!!')
+                    let localer = Math.floor(Math.random() * 2)
+                    if (localer == 1) {
+                        this.airBoy = new Obst(this, 1000, borderUISize*5, 'roadsign', 0, 3 * this.timeScale).setOrigin(0, 0).setScale(.85)
+                        this.airBoy2 = new Obst(this, 995, borderUISize*5 + 185, 'roadsignpole', 0, 3 * this.timeScale).setOrigin(0, 0).setScale(.85)
+                        this.airBoy2.depth = 2
+                    } else {
+                        this.airBoy = new Obst(this, 1000, borderUISize*4, 'blackhawk', 0, 5 * this.timeScale).setOrigin(0, 0).setScale(.85)
+                        this.hele = this.sound.add('hele')
+                        this.hele.setRate(3 * (1 + ((this.timeScale - 1) / 10)))
+                        this.hele.play()
+                    }
+                }else{
+                    //console.log('ground')
+                    let localer = Math.floor(Math.random() * 3)
+                    if (localer == 1) {
+                        this.groundBoy = new Obst(this, 1000, borderUISize*8.5, 'tvman', 0, 3 * this.timeScale).setOrigin(0, 0).setScale(.85)
+                    } else if (localer == 2) {
+                        this.groundBoy = new Obst(this, 1000, borderUISize*9.5, 'photochad', 0, 3 * this.timeScale).setOrigin(0, 0).setScale(.90)
+                    } else {
+                        this.groundBoy = new Obst(this, 1000, borderUISize*6, 'jeep', 0, 4 * this.timeScale).setOrigin(0, 0).setScale(.85)
+                        this.honk = this.sound.add('horn')
+                        this.honk.setRate(1.5 * (1 + ((this.timeScale - 1) / 10)))
+                        this.car = this.sound.add('car')
+                        this.car.setVolume(.25)
+                        this.car.setRate(6 * (1 + ((this.timeScale - 1) / 10)))
+                        this.car.play()
+                        this.honk.play()
+                    }
+                }
+            }
+            this.doSpawn = true;
+        })
     }
 
-    shipExplode(ship) {
-        /*
-        // temporarily hide ship
-        ship.alpha = 0
-        // create explosion sprite at ship's position
-        let boom = this.add.sprite(ship.x, ship.y, 'explosion').setOrigin(0, 0);
-        boom.anims.play('explode')             // play explode animation
-        boom.on('animationcomplete', () => {   // callback after anim completes
-          ship.reset()                         // reset ship position
-          ship.alpha = 1                       // make ship visible again
-          boom.destroy()                       // remove explosion sprite
-        })
+    hitMe(alien, boy) {
+        let pow = this.add.sprite(alien.x, alien.y - 200, 'kaboom').setOrigin(0, 0).setScale(4);
         
-        this.p1Score += ship.points
-        this.scoreLeft.text = this.p1Score
+        game.settings.speed = 0
+        alien.destroy()
+        if (this.airBoy2) {
+            //console.log('Buh')
+            this.airBoy2.destroy()
+        }
+        boy.destroy()
+        this.gameOver = true
+        this.backer = this.timeScale
+        this.sound.play('splode')
+        pow.anims.play('splosion')
+        pow.on('animationcomplete', () => {         
+            pow.destroy()                
+        })
 
-        this.sound.play('sfx-explosion')
-        */
+        let menuConfig = {
+            fontFamily: 'Stencil',
+            fontSize: '64px',
+            color: '#FFFFFF',
+            align: 'center',
+            padding: {
+                 top: 5,
+                bottom: 5,
+            },
+            fixedWidth: 0
+        }
+
+        
+
+        this.add.text(game.config.width/2, game.config.height/2 - borderUISize - borderPadding, 'You\'ve Been', menuConfig).setOrigin(0.5)
+        menuConfig.fontSize = '96px'
+        this.add.text(game.config.width/2, 20 + game.config.height/2, 'CLASSIFIED', menuConfig).setOrigin(0.5)
+        menuConfig.color = '#D9DFEE'
+        menuConfig.fontSize = '32px'
+        this.add.text(game.config.width/2, 80 + game.config.height/2, 'Press "SPACEBAR" to restart', menuConfig).setOrigin(0.5)
+        this.add.text(game.config.width/2, 110 + game.config.height/2, 'Or "ENTER" to return to menu', menuConfig).setOrigin(0.5)
+        //console.log('Oops')
     }
 }
