@@ -113,14 +113,14 @@ class Menu extends Phaser.Scene {
             fixedWidth: 0
         }
 
-        this.add.text(game.config.width/2, game.config.height/2 - borderUISize - borderPadding, 'REDACTED RACEWAY', menuConfig).setOrigin(0.5)
+        this.add.text(game.config.width/2, 15 + game.config.height/2 - borderUISize - borderPadding, 'REDACTED RACEWAY', menuConfig).setOrigin(0.5)
         menuConfig.color = '#D9DFEE'
         menuConfig.fontSize = '32px'
-        this.add.text(game.config.width/2, 15 + game.config.height/2, 'Press "ENTER" to start', menuConfig).setOrigin(0.5)
+        this.add.text(game.config.width/2, 25 + game.config.height/2, 'Press "ENTER" to start', menuConfig).setOrigin(0.5)
         //menuConfig.backgroundColor = '#A0B0D7'
         
         //menuConfig.color = '#D9DFEE'
-        this.add.text(game.config.width/2, 10 + game.config.height/2 + borderUISize + borderPadding, 'Press "SPACEBAR" for credits', menuConfig).setOrigin(0.5)
+        this.add.text(game.config.width/2, 20 + game.config.height/2 + borderUISize + borderPadding, 'Press "SPACEBAR" for credits', menuConfig).setOrigin(0.5)
 
         //this.add.text(20, 20, "Rocket Patrol Menu")
 

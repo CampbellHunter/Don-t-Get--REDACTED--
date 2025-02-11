@@ -4,6 +4,7 @@ class Play extends Phaser.Scene {
     }
     
     create() {
+        this.physics.world.drawDebug = false
         this.music = this.sound.add('music')
         this.music.setLoop(true)
         this.music.setVolume(.25)
@@ -22,6 +23,12 @@ class Play extends Phaser.Scene {
         this.airBoy = new Obst(this, -400, 0, 'roadsign', 0, 4).setOrigin(0, 0).setScale(.85)
         this.airBoy2 = new Obst(this, -400, 0, 'roadsignpole', 0, 4).setOrigin(0, 0).setScale(.85)
         
+        this.input.keyboard.on('keydown-D', function() {
+            this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true
+            this.physics.world.debugGraphic.clear()
+        }, this)
+
+        document.getElementById('info').innerHTML = '"UP": jump | "DOWN": Slide | "D": debug (toggle)'
 
         this.faded = this.add.rectangle(0, 0, game.config.width, game.config.height, 0xa0b0d7).setOrigin(0, 0)
         this.faded.alpha = 0
@@ -53,10 +60,12 @@ class Play extends Phaser.Scene {
     update() {
         
         if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyRESET)) {
+            this.music.pause()
             this.scene.restart()
         }
 
         if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyMENU)) {
+            this.music.pause()
             this.scene.start("menuScene")
          }
 
@@ -123,6 +132,7 @@ class Play extends Phaser.Scene {
                     } else {
                         this.airBoy = new Obst(this, 1000, borderUISize*4, 'blackhawk', 0, 5 * this.timeScale).setOrigin(0, 0).setScale(.85)
                         this.hele = this.sound.add('hele')
+                        this.airBoy.depth = 2
                         this.hele.setRate(3 * (1 + ((this.timeScale - 1) / 10)))
                         this.hele.play()
                     }
@@ -135,6 +145,7 @@ class Play extends Phaser.Scene {
                     } else {
                         this.groundBoy = new Obst(this, 1000, borderUISize*6, 'jeep', 0, 4 * this.timeScale).setOrigin(0, 0).setScale(.85)
                         this.honk = this.sound.add('horn')
+                        this.groundBoy.depth = 2
                         this.honk.setRate(1.5 * (1 + ((this.timeScale - 1) / 10)))
                         this.car = this.sound.add('car')
                         this.car.setVolume(.25)
@@ -179,12 +190,12 @@ class Play extends Phaser.Scene {
 
         
 
-        this.add.text(game.config.width/2, game.config.height/2 - borderUISize - borderPadding, 'You\'ve Been', menuConfig).setOrigin(0.5)
+        this.add.text(game.config.width/2, -20 + game.config.height/2 - borderUISize - borderPadding, 'You\'ve Been', menuConfig).setOrigin(0.5)
         menuConfig.fontSize = '96px'
-        this.add.text(game.config.width/2, 20 + game.config.height/2, 'CLASSIFIED', menuConfig).setOrigin(0.5)
+        this.add.text(game.config.width/2, 7 + game.config.height/2, 'CLASSIFIED', menuConfig).setOrigin(0.5)
         menuConfig.color = '#D9DFEE'
         menuConfig.fontSize = '32px'
-        this.add.text(game.config.width/2, 80 + game.config.height/2, 'Press "SPACEBAR" to restart', menuConfig).setOrigin(0.5)
+        this.add.text(game.config.width/2, 70 + game.config.height/2, 'Press "SPACEBAR" to restart', menuConfig).setOrigin(0.5)
         this.add.text(game.config.width/2, 110 + game.config.height/2, 'Or "ENTER" to return to menu', menuConfig).setOrigin(0.5)
     }
 }
