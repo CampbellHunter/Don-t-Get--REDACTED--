@@ -12,6 +12,7 @@ I tryed to have a cohesive "look" throughout, which I think I did pretty well.
 I also just love the sound elements, aspecially with the music increasing in speed up until the players death,
 where it then plumets back down into silence. 
 */
+//Citations: Using frameworks provided for previous assignments, and some inspiration and guidance from https://docs.phaser.io/phaser/concepts/
 
 
 'use strict'
