@@ -8,30 +8,20 @@ class Play extends Phaser.Scene {
         this.music.setLoop(true)
         this.music.setVolume(.25)
         this.music.play()
-        //this.sound.play('music')
         this.sky = this.add.tileSprite(0, 0, 768, 512, 'sky').setOrigin(0, 0).setScale(2)
         this.background = this.add.tileSprite(0, 0, 768, 512, 'background').setOrigin(0, 0).setScale(2)
         this.foreground = this.add.tileSprite(0, 0, 768, 512, 'foreground').setOrigin(0, 0).setScale(2)
 
         this.physics.world.setBounds(-600, 0, 1668, 450)
-        //const entities = this.physics.add.group()
-        //const meanies = this.physics.add.staticGroup()
-        //this.physics.add.collider(entities, meanies)
 
         this.alien = new Alien(this, 120, 420, 'alien', 0)
         this.alien.depth = 1
-        //entities.add(this.alien)
         this.keys = this.input.keyboard.createCursorKeys()
 
         this.groundBoy = new Obst(this, -400, 0, 'tvman', 0, 4).setOrigin(0, 0).setScale(.85)
-        //meanies.add(this.groundBoy)
         this.airBoy = new Obst(this, -400, 0, 'roadsign', 0, 4).setOrigin(0, 0).setScale(.85)
-        //meanies.add(this.airBoy)
         this.airBoy2 = new Obst(this, -400, 0, 'roadsignpole', 0, 4).setOrigin(0, 0).setScale(.85)
         
-
-        //this.physics.world.addCollider(this.alien, this.airBoy2)
-        //this.physics.world.addCollider(this.entities, this.meanies)
 
         this.faded = this.add.rectangle(0, 0, game.config.width, game.config.height, 0xa0b0d7).setOrigin(0, 0)
         this.faded.alpha = 0
@@ -54,43 +44,10 @@ class Play extends Phaser.Scene {
         this.timeScale = 1
         this.backer = 1
 
-        //this.p1Rocket = new Rocket(this, game.config.width/2, game.config.height - borderUISize - borderPadding, 'rocket').setOrigin(0.5, 0)
-
-        //keyFIRE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F)
         keyRESET = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE)
         keyMENU = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
-        //keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT)
 
-        //this.ship01 = new Spaceship(this, game.config.width + borderUISize*6, borderUISize*4, 'spaceship', 0, 30).setOrigin(0, 0)
-        //this.ship02 = new Spaceship(this, game.config.width + borderUISize*3, borderUISize*5 + borderPadding*2, 'spaceship', 0, 20).setOrigin(0,0)
-        //this.ship03 = new Spaceship(this, game.config.width, borderUISize*6 + borderPadding*4, 'spaceship', 0, 10).setOrigin(0,0)
-
-        //this.p1Score = 0
-
-        /*
-        let scoreConfig = {
-            fontFamily: 'Courier',
-            fontSize: '28px',
-            backgroundColor: '#F3B141',
-            color: '#843605',
-            align: 'right',
-            padding: {
-                 top: 5,
-                bottom: 5,
-            },
-            fixedWidth: 100
-        }
-        this.scoreLeft = this.add.text(borderUISize + borderPadding, borderUISize + borderPadding*2, this.p1Score, scoreConfig)
-        */
         this.gameOver = false
-        /*
-        scoreConfig.fixedWidth = 0
-        this.clock = this.time.delayedCall(game.settings.gameTimer, () => {
-            this.add.text(game.config.width/2, game.config.height/2, 'GAME OVER', scoreConfig).setOrigin(0.5)
-            this.add.text(game.config.width/2, game.config.height/2 + 64, 'Press (R) to Restart or ← for Menu', scoreConfig).setOrigin(0.5)
-            this.gameOver = true
-        }, null, this)
-        */
     }
 
     update() {
@@ -112,7 +69,6 @@ class Play extends Phaser.Scene {
             
             let timetext = ("00000" + (Math.floor((this.time.now - this.timeOff)/ 10))).slice(-5)
             this.timeRunning.text = timetext
-            //console.log(game.settings.speed)
 
             this.timeScale = 1 + (this.time.now - this.timeOff)/ 100000
             game.settings.speed = this.timeScale
@@ -120,14 +76,12 @@ class Play extends Phaser.Scene {
 
             this.physics.add.collider(this.alien, this.groundBoy, () => this.hitMe(this.alien, this.groundBoy), null, this)
             this.physics.add.collider(this.alien, this.airBoy, () => this.hitMe(this.alien, this.airBoy), null, this)
-            //this.physics.world.collide(this.alien, this.airBoy2)
 
             this.alienFSM.step()
             this.foreground.tilePositionX += (1.5 * this.timeScale)
             this.background.tilePositionX += (0.25 * this.timeScale)
             
             if (this.doSpawn) {
-                //console.log('Gonna spawn!')
                 this.doSpawn = false;
                 this.spawnBoy()
             }
@@ -137,7 +91,6 @@ class Play extends Phaser.Scene {
                 this.groundBoy.update()
                 this.airBoy.update()
                 this.airBoy2.update()
-                //this.physics.world.addCollider(this.entities, this.meanies)
         } else {
             if (this.faded.alpha < 1) {
                 this.faded.alpha += 0.001
@@ -154,45 +107,14 @@ class Play extends Phaser.Scene {
                 this.music.pause()
             }
         }
-        
-        /*
-        if(this.checkCollision(this.alien, this.groundBoy)) {
-            //this.p1Rocket.reset()
-            //this.shipExplode(this.ship03) 
-            console.log('DED!')
-        }
-        if (this.checkCollision(this.alien, this.airBoy)) {
-            //this.p1Rocket.reset()
-            //this.shipExplode(this.ship02) 
-            console.log('DED!')
-        }
-        if (this.checkCollision(this.alien, this.airBoy2)) {
-            //this.p1Rocket.reset()
-            //this.shipExplode(this.ship01) 
-            console.log('DED!')
-        }
-        */
     }
-    /*
-    checkCollision(obst, alien) {
-        
-        if (alien.x < obst.x + (obst.width * 0.75) && 
-            alien.x + alien.width > obst.x && 
-            alien.y < obst.y + (obst.height * 0.75) &&
-            alien.height + alien.y > obst. y) {
-            return true
-        } else {
-            return false
-        }
-    }
-    */
+
     spawnBoy() {
         let spawner = Math.floor(Math.random() * 5000 + 5000) / this.timeScale
         this.clock = this.time.delayedCall(spawner, () => {
             let local = Math.floor(Math.random() * 3)
             if (this.gameOver == false) {
                 if (local == 2) {
-                    //console.log('air!!')
                     let localer = Math.floor(Math.random() * 2)
                     if (localer == 1) {
                         this.airBoy = new Obst(this, 1000, borderUISize*5, 'roadsign', 0, 3 * this.timeScale).setOrigin(0, 0).setScale(.85)
@@ -205,7 +127,6 @@ class Play extends Phaser.Scene {
                         this.hele.play()
                     }
                 }else{
-                    //console.log('ground')
                     let localer = Math.floor(Math.random() * 3)
                     if (localer == 1) {
                         this.groundBoy = new Obst(this, 1000, borderUISize*8.5, 'tvman', 0, 3 * this.timeScale).setOrigin(0, 0).setScale(.85)
@@ -233,7 +154,6 @@ class Play extends Phaser.Scene {
         game.settings.speed = 0
         alien.destroy()
         if (this.airBoy2) {
-            //console.log('Buh')
             this.airBoy2.destroy()
         }
         boy.destroy()
@@ -266,6 +186,5 @@ class Play extends Phaser.Scene {
         menuConfig.fontSize = '32px'
         this.add.text(game.config.width/2, 80 + game.config.height/2, 'Press "SPACEBAR" to restart', menuConfig).setOrigin(0.5)
         this.add.text(game.config.width/2, 110 + game.config.height/2, 'Or "ENTER" to return to menu', menuConfig).setOrigin(0.5)
-        //console.log('Oops')
     }
 }

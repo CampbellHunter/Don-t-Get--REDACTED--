@@ -18,14 +18,10 @@ class Obst extends Phaser.GameObjects.Sprite {
     }
 
     update() {
-        //let moveDirection = new Phaser.Math.Vector2(0, 0)
-        //moveDirection.x = -1
         this.x -= this.moveSpeed
 
         if(this.x <= 0 - this.width) {
             this.destroy()
-        } else {  
-            //this.body.setVelocity(-this.moveSpeed * 175, 0)
         }
     }
 }

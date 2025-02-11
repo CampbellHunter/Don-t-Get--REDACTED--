@@ -1,6 +1,6 @@
 class Alien extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, texture, frame) {
-        super(scene, x, y, texture, frame) // call Sprite parent class
+        super(scene, x, y, texture, frame)
         scene.add.existing(this)
         scene.physics.add.existing(this)
         this.jumper = scene.sound.add('jumper')
@@ -8,21 +8,18 @@ class Alien extends Phaser.Physics.Arcade.Sprite {
 
         this.body.setSize(this.width / 2, this.height / 2)
         this.body.setCollideWorldBounds(true)
-        //this.setVelocity(0)
         this.setGravityY(1000)
 
         this.alienVelocity = 1
 
-        // initialize state machine managing hero (initial state, possible states, state args[])
         scene.alienFSM = new StateMachine('running', {
             running: new RunState(),
             jumping: new JumpState(),
             sliding: new SlideState(),
-        }, [scene, this])   // pass these as arguments to maintain scene/object context in the FSM
+        }, [scene, this])
     }
 }
 
-// hero-specific state classes
 class RunState extends State {
     enter(scene, alien) {
         if (game.settings.speed >= 2.5) {
@@ -32,19 +29,16 @@ class RunState extends State {
             this.alienVelocity = 3
             alien.anims.play(`alien-runnerer`)
         } else if (game.settings.speed >= 1.5) {
-            console.log('Faster')
             this.alienVelocity = 2
             alien.anims.play(`alien-runnerer`)
         } else {
             alien.anims.play(`alien-run`)
         }
-        //alien.anims.play(`alien-run`)
         alien.anims.stop()
     }
 
     execute(scene, alien) {
         const { up, down } = scene.keys
-        //console.log(alien.body.velocity)
         if(Phaser.Input.Keyboard.JustDown(up) && alien.body.velocity.y == 0) {
             this.stateMachine.transition('jumping')
             return
@@ -57,10 +51,8 @@ class RunState extends State {
         if (this.alienVelocity == 4) {
             alien.anims.play(`alien-runnererer`, true)
         } else if (this.alienVelocity == 3) {
-            //console.log('FASTER')
             alien.anims.play(`alien-runnerer`, true)
         } else if (this.alienVelocity == 2) {
-            //console.log('Faster')
             alien.anims.play(`alien-runner`, true)
         } else {
             alien.anims.play(`alien-run`, true)
